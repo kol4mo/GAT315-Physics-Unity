@@ -29,6 +29,8 @@ public class CarController : MonoBehaviour {
                 axle.leftWheel.collider.motorTorque = motor;
                 axle.rightWheel.collider.motorTorque = motor;
             }
+            UpdateWheelTransform(axle.leftWheel);
+            UpdateWheelTransform(axle.rightWheel);
         }
     }
 
