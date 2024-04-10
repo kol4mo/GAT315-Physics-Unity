@@ -5,7 +5,16 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Collider.unity
     guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/Scenes/Block Buster.unity
+    guid: 57960746fecc22f48b5f3a3ee3c46056
+  - enabled: 1
+    path: Assets/Scenes/Block Buster 1.unity
+    guid: db25df4e90e279c4b867a8e43b04b5eb
+  - enabled: 1
+    path: Assets/Scenes/Block Buster 2.unity
+    guid: 64a4bee818f3b254782b6b65b478ebe2
   m_configObjects: {}

@@ -1080,7 +1080,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: beecc8f406da0fd4386aa8784ff3521e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 0.1
+  speed: 5
   angulerSpeed: 1
   space: 1
   mode: 1

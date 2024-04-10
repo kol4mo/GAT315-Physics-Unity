@@ -17,6 +17,7 @@ public class CarController : MonoBehaviour {
     [SerializeField] Axle[] axles;
     [SerializeField] float maxMotorTorque;
     [SerializeField] float maxSteeringAngle;
+    [SerializeField] float counterbalance;
     public void FixedUpdate() {
         float motor = Input.GetAxis("Vertical") * maxMotorTorque;
         float steering = Input.GetAxis("Horizontal") * maxSteeringAngle;
@@ -31,6 +32,14 @@ public class CarController : MonoBehaviour {
             }
             UpdateWheelTransform(axle.leftWheel);
             UpdateWheelTransform(axle.rightWheel);
+        }
+
+        //counter balance
+        if (transform.rotation.z != 0f) {
+            float z = transform.rotation.z;
+            z = z * -1 * counterbalance;
+            Rigidbody rb = GetComponent<Rigidbody>();
+            rb.AddRelativeTorque(new Vector3(0,0,z));
         }
     }
 
