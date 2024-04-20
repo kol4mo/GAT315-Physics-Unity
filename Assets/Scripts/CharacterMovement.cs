@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 
 [RequireComponent(typeof(CharacterController))]
 public class CharacterMovement : MonoBehaviour {
@@ -15,9 +16,12 @@ public class CharacterMovement : MonoBehaviour {
     [SerializeField] float pushPower = 2.0f;
     [SerializeField] float rotationRate;
     [SerializeField] Animator ani;
+    [SerializeField] Rig rig;
 
     private void Start() {
         controller = gameObject.GetComponent<CharacterController>();
+
+        rig.weight = ani.GetBool("Equipped") ? 1 : 0;
     }
 
     void Update() {
@@ -45,7 +49,10 @@ public class CharacterMovement : MonoBehaviour {
 
         if (Input.GetKeyDown(KeyCode.E)) {
             ani.SetBool("Equipped", !ani.GetBool("Equipped"));
+            rig.weight = ani.GetBool("Equipped") ? 1 : 0;
         }
+
+
 
         velocity.y += gravityValue * Time.deltaTime;
         ani.SetFloat("VelocityY", velocity.y);
