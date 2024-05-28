@@ -1,22 +1,24 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 [RequireComponent(typeof(MeshFilter)), RequireComponent(typeof(MeshCollider))]
-public class WaterWave : MonoBehaviour
-{
+public class WaterWave : MonoBehaviour {
+
 	[System.Serializable]
-	struct Wave
-	{
+	struct Wave {
+
 		[Range(0, 10)] public float amplitude;
-		[Range(0, 10)] public float length;
+		[Range(1, 40)] public float length;
 		[Range(0, 10)] public float roll;
 		[Range(0, 10)] public float rate;
+		[Range(0, 360)] public float direction;
+
 	}
 
-	[SerializeField] Wave wave;
+	[SerializeField] Wave[] waves;
 
 	[Header("Mesh Generator")]
 	[SerializeField][Range(1, 80)] float xSize = 40;
@@ -31,8 +33,8 @@ public class WaterWave : MonoBehaviour
 	Vector3[] vertices;
 	Vector3[,] buffer;
 
-	void Start()
-	{
+	void Start() {
+
 		meshFilter = GetComponent<MeshFilter>();
 		meshCollider = GetComponent<MeshCollider>();
 
@@ -42,43 +44,75 @@ public class WaterWave : MonoBehaviour
 		vertices = mesh.vertices;
 
 		buffer = new Vector3[xVertexNum, zVertexNum];
+
 	}
 
-	Vector3 GerstnerWave(Vector3 pos, float time, float length, float amplitude, float roll) {
+	Vector3 GerstnerWave(Vector3 position, float time, float length, float amplitude, float roll) {
+
 		Vector3 v = Vector3.zero;
-		v.x = MathF.Cos(pos.x * length + time) * roll;
-		v.y = MathF.Sin(pos.x * length + v.x + time) * amplitude;
+
+		v.x = Mathf.Cos(position.x * length + time) * roll;
+		v.y = Mathf.Sin(position.x * length + time) * amplitude;
 
 		return v;
+
 	}
 
-	void Update()
-	{
+	Vector3 GerstnerWave(Vector3 position, Vector2 direction, float speed, float length, float amplitude, float roll) {
+
+		if (length == 0) return Vector3.zero;
+
+		Vector3 v = Vector3.zero;
+
+		float coord = position.x * direction.x + position.z * direction.y;
+		float k = 2 * Mathf.PI / length;
+		float f = k * coord + speed;
+
+		v.x = Mathf.Cos(f) * roll;
+		v.y = Mathf.Sin(f) * amplitude;
+
+		return v;
+
+	}
+
+	void Update() {
+
 		// update vertex values with wave
-		for (int z = 0; z < zVertexNum; z++)
-		{
+		for (int z = 0; z < zVertexNum; z++) {
+
 			float zPosition = ((float)z / (zVertexNum - 1) - 0.5f) * xSize;
-			for (int x = 0; x < xVertexNum; x++)
-			{
+			for (int x = 0; x < xVertexNum; x++) {
+
 				Vector3 p = Vector3.zero;
-				p.x = ((x / (float)(xVertexNum - 1)) - 0.5f) * xSize;
-				p.z = ((z / (float)(zVertexNum - 1)) - 0.5f) * zSize;
-				//p.y = MathF.Sin((p.x * wave.length) + (Time.time * wave.rate)) * wave.amplitude;
+				p.x = (x / (float)(xVertexNum - 1) - 0.5f) * xSize;
+				p.z = (z / (float)(zVertexNum - 1) - 0.5f) * zSize;
 
-				Vector3 o = GerstnerWave(p, Time.time * wave.rate, wave.length, wave.amplitude, wave.roll);
+				//Vector3 o = GerstnerWave( p, Time.time * wave.rate, wave.length, wave.amplitude, wave.roll);
+				Vector3 o = Vector3.zero;
+				for (int i = 0; i < waves.Length; i++) {
 
+					Vector2 d = new Vector2(Mathf.Cos(Mathf.Deg2Rad * waves[i].direction), Mathf.Sin(Mathf.Deg2Rad * waves[i].direction));
+					d.Normalize();
+
+					o += GerstnerWave(p, d, Time.time * waves[i].rate, waves[i].length, waves[i].amplitude, waves[i].roll);
+
+				}
 
 				buffer[x, z] = p + o;
+
 			}
+
 		}
 
 		// set vertices from buffer
-		for (int x = 0; x < xVertexNum; x++)
-		{
-			for (int z = 0; z < zVertexNum; z++)
-			{
+		for (int x = 0; x < xVertexNum; x++) {
+
+			for (int z = 0; z < zVertexNum; z++) {
+
 				vertices[x + z * xVertexNum] = buffer[x, z];
+
 			}
+
 		}
 
 		// recalculate mesh with new vertice values
@@ -87,5 +121,7 @@ public class WaterWave : MonoBehaviour
 		mesh.RecalculateTangents();
 		mesh.RecalculateBounds();
 		meshCollider.sharedMesh = mesh;
+
 	}
+
 }
